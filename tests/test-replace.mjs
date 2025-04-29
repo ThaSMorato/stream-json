@@ -1,7 +1,7 @@
 'use strict';
 
 import test from 'tape-six';
-import chain, {none, many} from 'stream-chain';
+import chain, { none, many } from '@thasmorato/stream-chain';
 
 import replace from '../src/filters/replace.js';
 import streamArray from '../src/streamers/stream-array.js';
@@ -9,8 +9,8 @@ import streamArray from '../src/streamers/stream-array.js';
 import readString from './read-string.mjs';
 
 test.asPromise('replace', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({packValues: false, filter: stack => stack[0] % 2})]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({ packValues: false, filter: stack => stack[0] % 2 })]),
     expected = [
       'startArray',
       'startObject',
@@ -51,10 +51,10 @@ test.asPromise('replace', (t, resolve, reject) => {
   });
 });
 
-const nullToken = {name: 'nullValue', value: null};
+const nullToken = { name: 'nullValue', value: null };
 
 test.asPromise('replace: nulls for arrays', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
     pipeline = chain([
       readString(JSON.stringify(input)),
       replace.withParser({
@@ -104,8 +104,8 @@ test.asPromise('replace: nulls for arrays', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: no streaming', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({streamValues: false, filter: stack => stack[0] % 2, streamValues: false})]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({ streamValues: false, filter: stack => stack[0] % 2, streamValues: false })]),
     expected = [
       'startArray',
       'startObject',
@@ -136,9 +136,9 @@ test.asPromise('replace: no streaming', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: objects', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({filter: stack => stack[0] % 2}), streamArray()]),
-    expected = [{a: {}}, {c: null}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({ filter: stack => stack[0] % 2 }), streamArray()]),
+    expected = [{ a: {} }, { c: null }, { e: 'e' }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -150,9 +150,9 @@ test.asPromise('replace: objects', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: objects with a string filter', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({filter: '1'}), streamArray()]),
-    expected = [{a: {}}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({ filter: '1' }), streamArray()]),
+    expected = [{ a: {} }, { c: null }, { d: 1 }, { e: 'e' }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -164,9 +164,9 @@ test.asPromise('replace: objects with a string filter', (t, resolve, reject) => 
 });
 
 test.asPromise('replace: objects with a RegExp filter', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({filter: /\b[1-5]\.[a-d]\b/, replacement: () => nullToken}), streamArray()]),
-    expected = [{a: {}}, {b: null}, {c: null}, {d: null}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({ filter: /\b[1-5]\.[a-d]\b/, replacement: () => nullToken }), streamArray()]),
+    expected = [{ a: {} }, { b: null }, { c: null }, { d: null }, { e: 'e' }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -178,8 +178,8 @@ test.asPromise('replace: objects with a RegExp filter', (t, resolve, reject) => 
 });
 
 test.asPromise('replace: empty', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({filter: stack => stack.length, replacement: () => nullToken}), streamArray()]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), replace.withParser({ filter: stack => stack.length, replacement: () => nullToken }), streamArray()]),
     expected = [null, null, null, null, null],
     result = [];
 
@@ -192,13 +192,13 @@ test.asPromise('replace: empty', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: objects once w/ RegExp filter', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
     pipeline = chain([
       readString(JSON.stringify(input)),
-      replace.withParser({filter: /\b[1-5]\.[a-d]\b/, once: true, replacement: () => nullToken}),
+      replace.withParser({ filter: /\b[1-5]\.[a-d]\b/, once: true, replacement: () => nullToken }),
       streamArray()
     ]),
-    expected = [{a: {}}, {b: null}, {c: null}, {d: 1}, {e: 'e'}],
+    expected = [{ a: {} }, { b: null }, { c: null }, { d: 1 }, { e: 'e' }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -210,16 +210,16 @@ test.asPromise('replace: objects once w/ RegExp filter', (t, resolve, reject) =>
 });
 
 test.asPromise('replace: many', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
     pipeline = chain([
       readString(JSON.stringify(input)),
       replace.withParser({
         filter: /^\d\.\w\b/,
-        replacement: many([{name: 'startNumber'}, {name: 'numberChunk', value: '0'}, {name: 'endNumber'}, {name: 'numberValue', value: '0'}])
+        replacement: many([{ name: 'startNumber' }, { name: 'numberChunk', value: '0' }, { name: 'endNumber' }, { name: 'numberValue', value: '0' }])
       }),
       streamArray()
     ]),
-    expected = [{a: 0}, {b: 0}, {c: 0}, {d: 0}, {e: 0}],
+    expected = [{ a: 0 }, { b: 0 }, { c: 0 }, { d: 0 }, { e: 0 }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -231,16 +231,16 @@ test.asPromise('replace: many', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: array', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
     pipeline = chain([
       readString(JSON.stringify(input)),
       replace.withParser({
         filter: /^\d\.\w\b/,
-        replacement: [{name: 'startNumber'}, {name: 'numberChunk', value: '0'}, {name: 'endNumber'}, {name: 'numberValue', value: '0'}]
+        replacement: [{ name: 'startNumber' }, { name: 'numberChunk', value: '0' }, { name: 'endNumber' }, { name: 'numberValue', value: '0' }]
       }),
       streamArray()
     ]),
-    expected = [{a: 0}, {b: 0}, {c: 0}, {d: 0}, {e: 0}],
+    expected = [{ a: 0 }, { b: 0 }, { c: 0 }, { d: 0 }, { e: 0 }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -253,13 +253,13 @@ test.asPromise('replace: array', (t, resolve, reject) => {
 
 test.asPromise('replace: string', (t, resolve, reject) => {
   const replacement = (_stack, chunk) => [
-    {name: 'startString'},
-    {name: 'stringChunk', value: chunk.name},
-    {name: 'endString'},
-    {name: 'stringValue', value: chunk.name}
+    { name: 'startString' },
+    { name: 'stringChunk', value: chunk.name },
+    { name: 'endString' },
+    { name: 'stringValue', value: chunk.name }
   ];
 
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
     pipeline = chain([
       readString(JSON.stringify(input)),
       replace.withParser({
@@ -268,7 +268,7 @@ test.asPromise('replace: string', (t, resolve, reject) => {
       }),
       streamArray()
     ]),
-    expected = [{a: 'startObject'}, {b: 'startArray'}, {c: 'nullValue'}, {d: 'startNumber'}, {e: 'startString'}],
+    expected = [{ a: 'startObject' }, { b: 'startArray' }, { c: 'nullValue' }, { d: 'startNumber' }, { e: 'startString' }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -280,7 +280,7 @@ test.asPromise('replace: string', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: empty replacement', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
     pipeline = chain([
       readString(JSON.stringify(input)),
       replace.withParser({
@@ -301,7 +301,7 @@ test.asPromise('replace: empty replacement', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: null replacement', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
     pipeline = chain([
       readString(JSON.stringify(input)),
       replace.withParser({
@@ -310,7 +310,7 @@ test.asPromise('replace: null replacement', (t, resolve, reject) => {
       }),
       streamArray()
     ]),
-    expected = [{a: null}, {b: null}, {c: null}, {d: null}, {e: null}],
+    expected = [{ a: null }, { b: null }, { c: null }, { d: null }, { e: null }],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));
@@ -322,18 +322,18 @@ test.asPromise('replace: null replacement', (t, resolve, reject) => {
 });
 
 test.asPromise('replace: bug63', (t, resolve, reject) => {
-  const input = [true, 42, {a: true, b: 42, c: 'hello'}, 'hello'],
+  const input = [true, 42, { a: true, b: 42, c: 'hello' }, 'hello'],
     pipeline = chain([
       readString(JSON.stringify(input)),
       replace.withParser({
         packValues: true,
         streamValues: false,
         filter: '2.b',
-        replacement: {name: 'numberValue', value: '0'}
+        replacement: { name: 'numberValue', value: '0' }
       }),
       streamArray()
     ]),
-    expected = [true, 42, {a: true, b: 0, c: 'hello'}, 'hello'],
+    expected = [true, 42, { a: true, b: 0, c: 'hello' }, 'hello'],
     result = [];
 
   pipeline.on('data', chunk => result.push(chunk.value));

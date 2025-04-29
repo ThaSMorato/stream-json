@@ -2,7 +2,7 @@
 
 'use strict';
 
-const {asStream: makeStream} = require('stream-chain');
+const { asStream: makeStream } = require('@thasmorato/stream-chain');
 
 function* dump(value, options, processed) {
   if (!processed) {
@@ -21,30 +21,30 @@ function* dump(value, options, processed) {
       return;
     case 'number':
       if (isNaN(value) || !isFinite(value)) {
-        yield {name: 'nullValue', value: null};
+        yield { name: 'nullValue', value: null };
       }
       value = String(value);
       if (options.streamNumbers) {
-        yield {name: 'startNumber'};
-        yield {name: 'numberChunk', value};
-        yield {name: 'endNumber'};
+        yield { name: 'startNumber' };
+        yield { name: 'numberChunk', value };
+        yield { name: 'endNumber' };
       }
       if (options.packNumbers) {
-        yield {name: 'numberValue', value};
+        yield { name: 'numberValue', value };
       }
       return;
     case 'string':
       if (options.streamStrings) {
-        yield {name: 'startString'};
-        yield {name: 'stringChunk', value};
-        yield {name: 'endString'};
+        yield { name: 'startString' };
+        yield { name: 'stringChunk', value };
+        yield { name: 'endString' };
       }
       if (options.packStrings) {
-        yield {name: 'stringValue', value};
+        yield { name: 'stringValue', value };
       }
       return;
     case 'boolean':
-      yield value ? {name: 'trueValue', value: true} : {name: 'falseValue', value: false};
+      yield value ? { name: 'trueValue', value: true } : { name: 'falseValue', value: false };
       return;
     case 'object':
       break;
@@ -54,13 +54,13 @@ function* dump(value, options, processed) {
 
   // null
   if (value === null) {
-    yield {name: 'nullValue', value: null};
+    yield { name: 'nullValue', value: null };
     return;
   }
 
   // Array
   if (Array.isArray(value)) {
-    yield {name: 'startArray'};
+    yield { name: 'startArray' };
     for (let i = 0; i < value.length; ++i) {
       let v = value[i];
       if (typeof v?.toJSON == 'function') {
@@ -78,12 +78,12 @@ function* dump(value, options, processed) {
       }
       yield* dump(v, options, true);
     }
-    yield {name: 'endArray'};
+    yield { name: 'endArray' };
     return;
   }
 
   // Object
-  yield {name: 'startObject'};
+  yield { name: 'startObject' };
   for (let [k, v] of Object.entries(value)) {
     if (options.dict && options.dict[k] !== 1) continue;
     if (typeof v?.toJSON == 'function') {
@@ -99,20 +99,20 @@ function* dump(value, options, processed) {
         continue;
     }
     if (options.streamKeys) {
-      yield {name: 'startKey'};
-      yield {name: 'stringChunk', value: k};
-      yield {name: 'endKey'};
+      yield { name: 'startKey' };
+      yield { name: 'stringChunk', value: k };
+      yield { name: 'endKey' };
     }
     if (options.packKeys) {
-      yield {name: 'keyValue', value: k};
+      yield { name: 'keyValue', value: k };
     }
     yield* dump(v, options, true);
   }
-  yield {name: 'endObject'};
+  yield { name: 'endObject' };
 }
 
 const disassembler = options => {
-  const opt = {packKeys: true, packStrings: true, packNumbers: true, streamKeys: true, streamStrings: true, streamNumbers: true};
+  const opt = { packKeys: true, packStrings: true, packNumbers: true, streamKeys: true, streamStrings: true, streamNumbers: true };
 
   if (options) {
     'packValues' in options && (opt.packKeys = opt.packStrings = opt.packNumbers = options.packValues);
@@ -139,7 +139,7 @@ const disassembler = options => {
   return value => dump(value, opt);
 };
 
-const asStream = options => makeStream(disassembler(options), Object.assign({}, options, {writableObjectMode: true, readableObjectMode: true}));
+const asStream = options => makeStream(disassembler(options), Object.assign({}, options, { writableObjectMode: true, readableObjectMode: true }));
 
 module.exports = disassembler;
 module.exports.disassembler = disassembler;

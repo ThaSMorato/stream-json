@@ -2,7 +2,7 @@
 
 'use strict';
 
-const {none} = require('stream-chain');
+const { none } = require('@thasmorato/stream-chain');
 
 const streamBase = require('./stream-base.js');
 const withParser = require('../utils/with-parser.js');
@@ -22,7 +22,7 @@ const streamArray = options => {
           ++key;
           asm.current.pop();
         } else {
-          return {key: key++, value: asm.current.pop()};
+          return { key: key++, value: asm.current.pop() };
         }
       }
       return none;

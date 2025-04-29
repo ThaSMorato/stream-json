@@ -4,10 +4,10 @@ import fs from 'node:fs';
 import zlib from 'node:zlib';
 
 import test from 'tape-six';
-import chain from 'stream-chain';
+import chain from '@thasmorato/stream-chain';
 
-import makeParser, {parser} from '../src/index.js';
-import Assembler, {assembler} from '../src/assembler.js';
+import makeParser, { parser } from '../src/index.js';
+import Assembler, { assembler } from '../src/assembler.js';
 
 import readString from './read-string.mjs';
 
@@ -37,7 +37,7 @@ test.asPromise('assembler: general', (t, resolve, reject) => {
 
 test.asPromise('assembler: no streaming', (t, resolve, reject) => {
   let object = null;
-  const parser = makeParser({streamValues: false}),
+  const parser = makeParser({ streamValues: false }),
     asm = Assembler.connectTo(parser);
 
   parser.on('end', () => {
@@ -61,9 +61,9 @@ test.asPromise('assembler: no streaming', (t, resolve, reject) => {
 });
 
 test.asPromise('assembler: json stream primitives', (t, resolve, reject) => {
-  const parser = makeParser({jsonStreaming: true}),
+  const parser = makeParser({ jsonStreaming: true }),
     asm = Assembler.connectTo(parser),
-    pattern = [1, 2, 'zzz', 'z\'z"z', null, true, false, 1, [], null, {}, true, {a: 'b'}],
+    pattern = [1, 2, 'zzz', 'z\'z"z', null, true, false, 1, [], null, {}, true, { a: 'b' }],
     result = [];
 
   asm.on('done', asm => result.push(asm.current));
@@ -83,15 +83,15 @@ test.asPromise('assembler: reviver', (t, resolve, reject) => {
   };
 
   const source = [
-      {a: 1, b: 2, c: 3},
-      {a: 1, b: 2, c: 3},
-      {a: 1, b: 2, c: 3}
-    ],
+    { a: 1, b: 2, c: 3 },
+    { a: 1, b: 2, c: 3 },
+    { a: 1, b: 2, c: 3 }
+  ],
     json = JSON.stringify(source),
     shouldBe = JSON.parse(json, reviver);
 
-  const parser = makeParser({streamValues: false}),
-    asm = Assembler.connectTo(parser, {reviver});
+  const parser = makeParser({ streamValues: false }),
+    asm = Assembler.connectTo(parser, { reviver });
 
   parser.on('end', () => {
     t.deepEqual(asm.current, shouldBe);
@@ -109,8 +109,8 @@ test.asPromise('assembler: no streaming with reviver', (t, resolve, reject) => {
   };
 
   let object = null;
-  const parser = makeParser({streamValues: false}),
-    asm = Assembler.connectTo(parser, {reviver});
+  const parser = makeParser({ streamValues: false }),
+    asm = Assembler.connectTo(parser, { reviver });
 
   parser.on('end', () => {
     t.deepEqual(asm.current, object);
@@ -134,19 +134,19 @@ test.asPromise('assembler: no streaming with reviver', (t, resolve, reject) => {
 
 test.asPromise('assembler: numberAsString', (t, resolve, reject) => {
   const source = [
-      {a: 1, b: 2, c: 3},
-      {a: 1, b: 2, c: 3},
-      {a: 1, b: 2, c: 3}
-    ],
+    { a: 1, b: 2, c: 3 },
+    { a: 1, b: 2, c: 3 },
+    { a: 1, b: 2, c: 3 }
+  ],
     json = JSON.stringify(source),
     shouldBe = [
-      {a: '1', b: '2', c: '3'},
-      {a: '1', b: '2', c: '3'},
-      {a: '1', b: '2', c: '3'}
+      { a: '1', b: '2', c: '3' },
+      { a: '1', b: '2', c: '3' },
+      { a: '1', b: '2', c: '3' }
     ];
 
-  const parser = makeParser({streamValues: false}),
-    asm = Assembler.connectTo(parser, {numberAsString: true});
+  const parser = makeParser({ streamValues: false }),
+    asm = Assembler.connectTo(parser, { numberAsString: true });
 
   parser.on('end', () => {
     t.deepEqual(asm.current, shouldBe);

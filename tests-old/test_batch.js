@@ -1,20 +1,20 @@
 'use strict';
 
 const unit = require('heya-unit');
-const {chain} = require('stream-chain');
+const { chain } = require('@thasmorato/stream-chain');
 
 const StreamArray = require('../streamers/StreamArray');
-const {batch} = require('../utils/Batch');
+const { batch } = require('../utils/Batch');
 
-const {readString} = require('./ReadString');
+const { readString } = require('./ReadString');
 
 unit.add(module, [
   function test_batch(t) {
     const async = t.startAsync('test_batch');
 
-    const pattern = [0, 1, true, false, null, {}, [], {a: 'b'}, ['c']],
+    const pattern = [0, 1, true, false, null, {}, [], { a: 'b' }, ['c']],
       result = [],
-      pipeline = chain([readString(JSON.stringify(pattern)), StreamArray.withParser(), batch({batchSize: 2})]);
+      pipeline = chain([readString(JSON.stringify(pattern)), StreamArray.withParser(), batch({ batchSize: 2 })]);
 
     pipeline.output.on('data', batch => {
       eval(t.TEST('batch.length == 2 || batch.length == 1'));
@@ -65,19 +65,19 @@ unit.add(module, [
         /*  3 */ false,
         /*  4 */ null,
         /*  5 */ {},
-        /*  - */ [],
-        /*  - */ {a: 'reject', b: [[[]]]},
-        /*  - */ ['c'],
-        /*  6 */ {a: 'accept'}, // accepted
-        /*  7 */ {a: 'neutral'},
-        /*  - */ {x: true, a: 'reject'},
-        /*  8 */ {y: null, a: 'accept'}, // accepted
-        /*  9 */ {z: 1234, a: 'neutral'},
-        /* 10 */ {w: '12', a: 'neutral'}
-      ],
+        /*  - */[],
+        /*  - */ { a: 'reject', b: [[[]]] },
+        /*  - */['c'],
+        /*  6 */ { a: 'accept' }, // accepted
+        /*  7 */ { a: 'neutral' },
+        /*  - */ { x: true, a: 'reject' },
+        /*  8 */ { y: null, a: 'accept' }, // accepted
+        /*  9 */ { z: 1234, a: 'neutral' },
+        /* 10 */ { w: '12', a: 'neutral' }
+    ],
       result = [],
       keys = [],
-      pipeline = chain([readString(JSON.stringify(input)), StreamArray.withParser({objectFilter: f}), batch({batchSize: 5})]);
+      pipeline = chain([readString(JSON.stringify(input)), StreamArray.withParser({ objectFilter: f }), batch({ batchSize: 5 })]);
 
     pipeline.output.on('data', batch => {
       eval(t.TEST('batch.length >= 1 || batch.length <= 5'));
@@ -124,19 +124,19 @@ unit.add(module, [
         /*  3 */ false,
         /*  4 */ null,
         /*  5 */ {},
-        /*  - */ [],
-        /*  - */ {a: 'reject', b: [[[]]]},
-        /*  - */ ['c'],
-        /*  6 */ {a: 'accept'}, // accepted
-        /*  7 */ {a: 'neutral'},
-        /*  - */ {x: true, a: 'reject'},
-        /*  8 */ {y: null, a: 'accept'}, // accepted
-        /*  9 */ {z: 1234, a: 'neutral'},
-        /* 10 */ {w: '12', a: 'neutral'}
-      ],
+        /*  - */[],
+        /*  - */ { a: 'reject', b: [[[]]] },
+        /*  - */['c'],
+        /*  6 */ { a: 'accept' }, // accepted
+        /*  7 */ { a: 'neutral' },
+        /*  - */ { x: true, a: 'reject' },
+        /*  8 */ { y: null, a: 'accept' }, // accepted
+        /*  9 */ { z: 1234, a: 'neutral' },
+        /* 10 */ { w: '12', a: 'neutral' }
+    ],
       result = [],
       keys = [],
-      pipeline = chain([readString(JSON.stringify(input)), StreamArray.withParser({objectFilter: f, includeUndecided: true}), batch({batchSize: 5})]);
+      pipeline = chain([readString(JSON.stringify(input)), StreamArray.withParser({ objectFilter: f, includeUndecided: true }), batch({ batchSize: 5 })]);
 
     pipeline.output.on('data', batch => {
       eval(t.TEST('batch.length >= 1 || batch.length <= 5'));

@@ -3,7 +3,7 @@
 'use strict';
 
 const EventEmitter = require('node:events');
-const {none} = require('stream-chain');
+const { none } = require('@thasmorato/stream-chain');
 
 const startObject = Ctr =>
   function () {

@@ -1,14 +1,14 @@
 'use strict';
 
 import test from 'tape-six';
-import chain from 'stream-chain';
+import chain from '@thasmorato/stream-chain';
 
 import streamValues from '../src/streamers/stream-values.js';
 
 import readString from './read-string.mjs';
 
 test.asPromise('parser: stream values', (t, resolve, reject) => {
-  const pattern = [1, 2, 3, true, false, '', 'Abc', [], [1], [1, []], {}, {a: 1}, {b: {}, c: [{}]}],
+  const pattern = [1, 2, 3, true, false, '', 'Abc', [], [1], [1, []], {}, { a: 1 }, { b: {}, c: [{}] }],
     result = [],
     pipeline = chain([readString(pattern.map(value => JSON.stringify(value)).join(' ')), streamValues.withParser()]);
 
@@ -20,8 +20,8 @@ test.asPromise('parser: stream values', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: stream values - no streaming tokens', (t, resolve, reject) => {
-  const stream = streamValues.withParserAsStream({streamValues: false}),
-    pattern = [1, 2, 3, true, false, '', 'Abc', [], [1], [1, []], {}, {a: 1}, {b: {}, c: [{}]}],
+  const stream = streamValues.withParserAsStream({ streamValues: false }),
+    pattern = [1, 2, 3, true, false, '', 'Abc', [], [1], [1, []], {}, { a: 1 }, { b: {}, c: [{}] }],
     result = [];
 
   stream.on('data', data => (result[data.key] = data.value));
@@ -64,7 +64,7 @@ test.asPromise('parser: stream values - filter', (t, resolve, reject) => {
     // undecided
   };
 
-  const stream = streamValues.withParserAsStream({objectFilter: f}),
+  const stream = streamValues.withParserAsStream({ objectFilter: f }),
     input = [
       0,
       1,
@@ -73,14 +73,14 @@ test.asPromise('parser: stream values - filter', (t, resolve, reject) => {
       null,
       {},
       [],
-      {a: 'reject', b: [[[]]]},
+      { a: 'reject', b: [[[]]] },
       ['c'],
-      {a: 'accept'},
-      {a: 'neutral'},
-      {x: true, a: 'reject'},
-      {y: null, a: 'accept'},
-      {z: 1234, a: 'neutral'},
-      {w: '12', a: 'neutral'}
+      { a: 'accept' },
+      { a: 'neutral' },
+      { x: true, a: 'reject' },
+      { y: null, a: 'accept' },
+      { z: 1234, a: 'neutral' },
+      { w: '12', a: 'neutral' }
     ],
     result = [];
 
@@ -117,7 +117,7 @@ test.asPromise('parser: stream values - filter include undecided', (t, resolve, 
     // undecided
   };
 
-  const stream = streamValues.withParserAsStream({objectFilter: f, includeUndecided: true}),
+  const stream = streamValues.withParserAsStream({ objectFilter: f, includeUndecided: true }),
     input = [
       0,
       1,
@@ -126,14 +126,14 @@ test.asPromise('parser: stream values - filter include undecided', (t, resolve, 
       null,
       {},
       [],
-      {a: 'reject', b: [[[]]]},
+      { a: 'reject', b: [[[]]] },
       ['c'],
-      {a: 'accept'},
-      {a: 'neutral'},
-      {x: true, a: 'reject'},
-      {y: null, a: 'accept'},
-      {z: 1234, a: 'neutral'},
-      {w: '12', a: 'neutral'}
+      { a: 'accept' },
+      { a: 'neutral' },
+      { x: true, a: 'reject' },
+      { y: null, a: 'accept' },
+      { z: 1234, a: 'neutral' },
+      { w: '12', a: 'neutral' }
     ],
     result = [];
 

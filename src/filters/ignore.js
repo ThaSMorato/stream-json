@@ -2,9 +2,9 @@
 
 'use strict';
 
-const {none} = require('stream-chain');
+const { none } = require('@thasmorato/stream-chain');
 
-const {filterBase, makeStackDiffer} = require('./filter-base.js');
+const { filterBase, makeStackDiffer } = require('./filter-base.js');
 const withParser = require('../utils/with-parser.js');
 
 const ignore = options => {
@@ -22,5 +22,5 @@ const ignore = options => {
 module.exports = ignore;
 module.exports.ignore = ignore;
 
-module.exports.withParser = options => withParser(ignore, Object.assign({packKeys: true}, options));
-module.exports.withParserAsStream = options => withParser.asStream(ignore, Object.assign({packKeys: true}, options));
+module.exports.withParser = options => withParser(ignore, Object.assign({ packKeys: true }, options));
+module.exports.withParserAsStream = options => withParser.asStream(ignore, Object.assign({ packKeys: true }, options));

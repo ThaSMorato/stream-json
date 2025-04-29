@@ -2,23 +2,23 @@
 
 const unit = require('heya-unit');
 
-const {chain} = require('stream-chain');
+const { chain } = require('@thasmorato/stream-chain');
 
-const {parser} = require('../Parser');
-const {filter} = require('../filters/Filter');
+const { parser } = require('../Parser');
+const { filter } = require('../filters/Filter');
 const Assembler = require('../Assembler');
 
-const {readString} = require('./ReadString');
+const { readString } = require('./ReadString');
 
 unit.add(module, [
   function test_filter(t) {
     const async = t.startAsync('test_filter');
 
     const input = '{"a": 1, "b": true, "c": ["d"]}',
-      pipeline = chain([readString(input), parser({packKeys: true, packValues: false}), filter({filter: /^(|a|c)$/})]),
+      pipeline = chain([readString(input), parser({ packKeys: true, packValues: false }), filter({ filter: /^(|a|c)$/ })]),
       result = [];
 
-    pipeline.on('data', chunk => result.push({name: chunk.name, val: chunk.value}));
+    pipeline.on('data', chunk => result.push({ name: chunk.name, val: chunk.value }));
     pipeline.on('end', () => {
       eval(t.ASSERT('result.length === 15'));
       eval(t.TEST("result[0].name === 'startObject'"));
@@ -45,12 +45,12 @@ unit.add(module, [
     const input = '{"a": 1, "b": true, "c": ["d"]}',
       pipeline = chain([
         readString(input),
-        parser({packKeys: true, packValues: false, streamValues: false}),
-        filter({filter: /^(|a|c)$/, streamValues: false})
+        parser({ packKeys: true, packValues: false, streamValues: false }),
+        filter({ filter: /^(|a|c)$/, streamValues: false })
       ]),
       result = [];
 
-    pipeline.on('data', chunk => result.push({name: chunk.name, val: chunk.value}));
+    pipeline.on('data', chunk => result.push({ name: chunk.name, val: chunk.value }));
     pipeline.on('end', () => {
       eval(t.ASSERT('result.length === 9'));
       eval(t.TEST("result[0].name === 'startObject'"));
@@ -68,9 +68,9 @@ unit.add(module, [
   function test_filter_deep(t) {
     const async = t.startAsync('test_filter_deep');
 
-    const data = {a: {b: {c: 1}}, b: {b: {c: 2}}, c: {b: {c: 3}}};
+    const data = { a: { b: { c: 1 } }, b: { b: { c: 2 } }, c: { b: { c: 3 } } };
 
-    const pipeline = chain([readString(JSON.stringify(data)), parser({streamValues: false}), filter({filter: /^(?:a|c)\.b\b/})]);
+    const pipeline = chain([readString(JSON.stringify(data)), parser({ streamValues: false }), filter({ filter: /^(?:a|c)\.b\b/ })]);
 
     const asm = Assembler.connectTo(pipeline);
 
@@ -102,9 +102,9 @@ unit.add(module, [
   function test_filter_bug46(t) {
     const async = t.startAsync('test_filter_bug46');
 
-    const data = [{data: {a: 1, b: 2}, x: 1}, {data: {a: 3, b: 4}, y: 2}];
+    const data = [{ data: { a: 1, b: 2 }, x: 1 }, { data: { a: 3, b: 4 }, y: 2 }];
 
-    const pipeline = chain([readString(JSON.stringify(data)), parser(), filter({filter: /data/})]);
+    const pipeline = chain([readString(JSON.stringify(data)), parser(), filter({ filter: /data/ })]);
 
     const asm = Assembler.connectTo(pipeline);
 

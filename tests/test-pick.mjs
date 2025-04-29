@@ -1,7 +1,7 @@
 'use strict';
 
 import test from 'tape-six';
-import chain from 'stream-chain';
+import chain from '@thasmorato/stream-chain';
 
 import pick from '../src/filters/pick.js';
 import streamValues from '../src/streamers/stream-values.js';
@@ -11,9 +11,9 @@ import streamObject from '../src/streamers/stream-object.js';
 import readString from './read-string.mjs';
 
 test.asPromise('parser: pick events', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}, {f: {f: true}}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }, { f: { f: true } }],
     result = [],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({packValues: false, filter: stack => stack.length === 2})]);
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ packValues: false, filter: stack => stack.length === 2 })]);
 
   pipeline.on('data', chunk => result.push(chunk.name));
   pipeline.on('error', reject);
@@ -43,9 +43,9 @@ test.asPromise('parser: pick events', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick packed events', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}, {f: {f: true}}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }, { f: { f: true } }],
     result = [],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: stack => stack.length === 2})]);
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: stack => stack.length === 2 })]);
 
   pipeline.on('data', chunk => result.push(chunk.name));
   pipeline.on('error', reject);
@@ -77,9 +77,9 @@ test.asPromise('parser: pick packed events', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick packed events no streaming', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}, {f: {f: true}}],
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }, { f: { f: true } }],
     result = [],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({streamValues: false, filter: stack => stack.length === 2})]);
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ streamValues: false, filter: stack => stack.length === 2 })]);
 
   pipeline.on('data', chunk => result.push(chunk.name));
   pipeline.on('error', reject);
@@ -102,8 +102,8 @@ test.asPromise('parser: pick packed events no streaming', (t, resolve, reject) =
 });
 
 test.asPromise('parser: pick objects', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: stack => stack.length === 2}), streamValues()]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: stack => stack.length === 2 }), streamValues()]),
     expected = [{}, [], null, 1, 'e'],
     result = [];
 
@@ -116,8 +116,8 @@ test.asPromise('parser: pick objects', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick objects string filter', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: '0.a'}), streamValues()]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: '0.a' }), streamValues()]),
     expected = [{}],
     result = [];
 
@@ -130,8 +130,8 @@ test.asPromise('parser: pick objects string filter', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick objects regexp filter', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: /\b[1-5]\.[a-d]\b/}), streamValues()]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: /\b[1-5]\.[a-d]\b/ }), streamValues()]),
     expected = [[], null, 1],
     result = [];
 
@@ -144,8 +144,8 @@ test.asPromise('parser: pick objects regexp filter', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick objects empty filter', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: () => false}), streamValues()]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: () => false }), streamValues()]),
     expected = [],
     result = [];
 
@@ -158,8 +158,8 @@ test.asPromise('parser: pick objects empty filter', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick objects once', (t, resolve, reject) => {
-  const input = [{a: {}}, {b: []}, {c: null}, {d: 1}, {e: 'e'}],
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: /\b[1-5]\.[a-d]\b/, once: true}), streamValues()]),
+  const input = [{ a: {} }, { b: [] }, { c: null }, { d: 1 }, { e: 'e' }],
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: /\b[1-5]\.[a-d]\b/, once: true }), streamValues()]),
     expected = [[]],
     result = [];
 
@@ -172,8 +172,8 @@ test.asPromise('parser: pick objects once', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick array', (t, resolve, reject) => {
-  const input = {a: [1, 2, 3], b: {c: 4, d: 5}},
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: 'a'}), streamArray()]),
+  const input = { a: [1, 2, 3], b: { c: 4, d: 5 } },
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: 'a' }), streamArray()]),
     expected = [1, 2, 3],
     result = [];
 
@@ -186,8 +186,8 @@ test.asPromise('parser: pick array', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: pick object', (t, resolve, reject) => {
-  const input = {a: [1, 2, 3], b: {c: 4, d: 5}},
-    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({filter: 'b'}), streamObject()]),
+  const input = { a: [1, 2, 3], b: { c: 4, d: 5 } },
+    pipeline = chain([readString(JSON.stringify(input)), pick.withParser({ filter: 'b' }), streamObject()]),
     expected = [4, 5],
     result = [];
 

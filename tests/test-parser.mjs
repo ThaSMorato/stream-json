@@ -1,7 +1,7 @@
 'use strict';
 
 import test from 'tape-six';
-import chain from 'stream-chain';
+import chain from '@thasmorato/stream-chain';
 
 import parser from '../src/parser.js';
 import Assembler from '../src/assembler.js';
@@ -10,10 +10,10 @@ import readString from './read-string.mjs';
 
 test.asPromise('parser: streaming values', (t, resolve, reject) => {
   const input = '{"a": 1, "b": true, "c": ["d"]}',
-    pipeline = chain([readString(input), parser({packValues: false})]),
+    pipeline = chain([readString(input), parser({ packValues: false })]),
     result = [];
 
-  pipeline.on('data', chunk => result.push({name: chunk.name, val: chunk.value}));
+  pipeline.on('data', chunk => result.push({ name: chunk.name, val: chunk.value }));
   pipeline.on('error', () => reject());
   pipeline.on('end', () => {
     t.ok(result.length === 20);
@@ -52,7 +52,7 @@ test.asPromise('parser: packing values', (t, resolve, reject) => {
     pipeline = chain([readString(input), parser()]),
     result = [];
 
-  pipeline.on('data', chunk => result.push({name: chunk.name, val: chunk.value}));
+  pipeline.on('data', chunk => result.push({ name: chunk.name, val: chunk.value }));
   pipeline.on('error', () => reject());
   pipeline.on('end', () => {
     t.equal(result.length, 25);
@@ -98,10 +98,10 @@ test.asPromise('parser: packing values', (t, resolve, reject) => {
 
 test.asPromise('parser: packing no streaming values', (t, resolve, reject) => {
   const input = '{"a": 1, "b": true, "c": ["d"], "e": -2, "f": 0}',
-    pipeline = chain([readString(input), parser({streamValues: false})]),
+    pipeline = chain([readString(input), parser({ streamValues: false })]),
     result = [];
 
-  pipeline.on('data', chunk => result.push({name: chunk.name, val: chunk.value}));
+  pipeline.on('data', chunk => result.push({ name: chunk.name, val: chunk.value }));
   pipeline.on('error', () => reject());
   pipeline.on('end', () => {
     t.equal(result.length, 14);
@@ -135,9 +135,9 @@ test.asPromise('parser: packing no streaming values', (t, resolve, reject) => {
 
 test.asPromise('parser: escaped', (t, resolve, reject) => {
   const object = {
-      stringWithTabsAndNewlines: "Did it work?\nNo...\t\tI don't think so...",
-      anArray: [1, 2, true, 'tabs?\t\t\t\u0001\u0002\u0003', false]
-    },
+    stringWithTabsAndNewlines: "Did it work?\nNo...\t\tI don't think so...",
+    anArray: [1, 2, true, 'tabs?\t\t\t\u0001\u0002\u0003', false]
+  },
     input = JSON.stringify(object),
     pipeline = readString(input).pipe(parser.asStream()),
     assembler = Assembler.connectTo(pipeline);
@@ -172,14 +172,14 @@ test.asPromise('parser: survives roundtrip - 1.5e33', survivesRoundtrip(1.5e33))
 test.asPromise('parser: survives roundtrip - string', survivesRoundtrip('hi'));
 test.asPromise('parser: survives roundtrip - empty object', survivesRoundtrip({}));
 test.asPromise('parser: survives roundtrip - empty array', survivesRoundtrip([]));
-test.asPromise('parser: survives roundtrip - object', survivesRoundtrip({a: 1, b: true, c: 'd'}));
+test.asPromise('parser: survives roundtrip - object', survivesRoundtrip({ a: 1, b: true, c: 'd' }));
 test.asPromise('parser: survives roundtrip - array', survivesRoundtrip([1, 2, true, 'd', false]));
 
 const runSlidingWindowTest = quant => (t, resolve, reject) => {
   const object = {
-      stringWithTabsAndNewlines: "Did it work?\nNo...\t\tI don't think so...",
-      anArray: [1, 2, true, 'tabs?\t\t\t\u0001\u0002\u0003', false]
-    },
+    stringWithTabsAndNewlines: "Did it work?\nNo...\t\tI don't think so...",
+    anArray: [1, 2, true, 'tabs?\t\t\t\u0001\u0002\u0003', false]
+  },
     input = JSON.stringify(object),
     pipeline = readString(input, quant).pipe(parser.asStream()),
     assembler = Assembler.connectTo(pipeline);
@@ -207,34 +207,34 @@ test.asPromise('parser: sliding window - 13', runSlidingWindowTest(13));
 
 const runJsonStreamingTest =
   (len, sep = '') =>
-  (t, resolve, reject) => {
-    const objects = [];
-    for (let n = 0; n < len; n += 1) {
-      objects.push({
-        stringWithTabsAndNewlines: "Did it work?\nNo...\t\tI don't think so...",
-        anArray: [n + 1, n + 2, true, 'tabs?\t\t\t\u0001\u0002\u0003', false],
-        n
+    (t, resolve, reject) => {
+      const objects = [];
+      for (let n = 0; n < len; n += 1) {
+        objects.push({
+          stringWithTabsAndNewlines: "Did it work?\nNo...\t\tI don't think so...",
+          anArray: [n + 1, n + 2, true, 'tabs?\t\t\t\u0001\u0002\u0003', false],
+          n
+        });
+      }
+
+      let json = [];
+      for (let n = 0; n < objects.length; n += 1) {
+        json.push(JSON.stringify(objects[n]));
+      }
+
+      const input = json.join(sep);
+      const pipeline = readString(input, 4).pipe(parser.asStream({ jsonStreaming: true }));
+      const assembler = Assembler.connectTo(pipeline);
+
+      assembler.on('done', asm => {
+        const { current: obj } = asm;
+        const { n } = obj;
+        t.deepEqual(obj, objects[n]);
       });
-    }
 
-    let json = [];
-    for (let n = 0; n < objects.length; n += 1) {
-      json.push(JSON.stringify(objects[n]));
-    }
-
-    const input = json.join(sep);
-    const pipeline = readString(input, 4).pipe(parser.asStream({jsonStreaming: true}));
-    const assembler = Assembler.connectTo(pipeline);
-
-    assembler.on('done', asm => {
-      const {current: obj} = asm;
-      const {n} = obj;
-      t.deepEqual(obj, objects[n]);
-    });
-
-    pipeline.on('error', reject);
-    pipeline.on('end', resolve);
-  };
+      pipeline.on('error', reject);
+      pipeline.on('end', resolve);
+    };
 
 test.asPromise('parser: json streaming - 1', runJsonStreamingTest(1, ''));
 test.asPromise('parser: json streaming - 5', runJsonStreamingTest(5, ''));
@@ -269,7 +269,7 @@ test.asPromise('parser: infinite fail', (t, resolve, reject) => {
       function* () {
         while (true) yield sample;
       },
-      parser({jsonStreaming: true, packValues: true, streamValues: false})
+      parser({ jsonStreaming: true, packValues: true, streamValues: false })
     ]);
 
   pipeline.on('error', resolve);
@@ -286,8 +286,8 @@ test.asPromise('parser: empty stream', (t, resolve, reject) => {
     result = [],
     pipeline = chain([
       readString(input),
-      parser({packValues: false, jsonStreaming: true}),
-      token => result.push({...token})
+      parser({ packValues: false, jsonStreaming: true }),
+      token => result.push({ ...token })
     ]);
 
   pipeline.on('error', reject);

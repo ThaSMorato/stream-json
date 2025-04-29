@@ -2,9 +2,9 @@
 
 'use strict';
 
-const {none, isMany, getManyValues, combineManyMut, many} = require('stream-chain');
+const { none, isMany, getManyValues, combineManyMut, many } = require('@thasmorato/stream-chain');
 
-const {filterBase, makeStackDiffer} = require('./filter-base.js');
+const { filterBase, makeStackDiffer } = require('./filter-base.js');
 const withParser = require('../utils/with-parser.js');
 
 const defaultReplacement = () => none;
@@ -38,5 +38,5 @@ const replace = options => {
 module.exports = replace;
 module.exports.replace = replace;
 
-module.exports.withParser = options => withParser(replace, Object.assign({packKeys: true}, options));
-module.exports.withParserAsStream = options => withParser.asStream(replace, Object.assign({packKeys: true}, options));
+module.exports.withParser = options => withParser(replace, Object.assign({ packKeys: true }, options));
+module.exports.withParserAsStream = options => withParser.asStream(replace, Object.assign({ packKeys: true }, options));

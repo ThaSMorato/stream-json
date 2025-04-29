@@ -55,7 +55,7 @@ This toolkit is distributed under New BSD license.
 ## Introduction
 
 ```js
-const {chain}  = require('stream-chain');
+const {chain}  = require('@thasmorato/stream-chain');
 
 const {parser} = require('stream-json');
 const {pick}   = require('stream-json/filters/Pick');

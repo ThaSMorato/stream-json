@@ -2,7 +2,7 @@
 
 'use strict';
 
-const {none} = require('stream-chain');
+const { none } = require('@thasmorato/stream-chain');
 
 const streamBase = require('./stream-base.js');
 const withParser = require('../utils/with-parser.js');
@@ -26,7 +26,7 @@ const streamObject = options => {
         key = null;
         return none;
       }
-      const result = {key, value: asm.current[key]};
+      const result = { key, value: asm.current[key] };
       asm.current = {};
       key = null;
       return result;

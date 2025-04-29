@@ -1,7 +1,7 @@
 'use strict';
 
 import test from 'tape-six';
-import chain from 'stream-chain';
+import chain from '@thasmorato/stream-chain';
 
 import streamObject from '../src/streamers/stream-object.js';
 
@@ -9,18 +9,18 @@ import readString from './read-string.mjs';
 
 test.asPromise('parser: stream object', (t, resolve, reject) => {
   const pattern = {
-      str: 'bar',
-      baz: null,
-      t: true,
-      f: false,
-      zero: 0,
-      one: 1,
-      obj: {},
-      arr: [],
-      deepObj: {a: 'b'},
-      deepArr: ['c'],
-      '': '' // tricky, yet legal
-    },
+    str: 'bar',
+    baz: null,
+    t: true,
+    f: false,
+    zero: 0,
+    one: 1,
+    obj: {},
+    arr: [],
+    deepObj: { a: 'b' },
+    deepArr: ['c'],
+    '': '' // tricky, yet legal
+  },
     result = {},
     pipeline = chain([readString(JSON.stringify(pattern)), streamObject.withParser()]);
 
@@ -49,7 +49,7 @@ test.asPromise('parser: stream object - fail', (t, resolve, reject) => {
 });
 
 test.asPromise('parser: stream object - no streaming', (t, resolve, reject) => {
-  const stream = streamObject.withParserAsStream({streamValues: false}),
+  const stream = streamObject.withParserAsStream({ streamValues: false }),
     pattern = {
       str: 'bar',
       baz: null,
@@ -59,7 +59,7 @@ test.asPromise('parser: stream object - no streaming', (t, resolve, reject) => {
       one: 1,
       obj: {},
       arr: [],
-      deepObj: {a: 'b'},
+      deepObj: { a: 'b' },
       deepArr: ['c'],
       '': '' // tricky, yet legal
     },
@@ -91,7 +91,7 @@ test.asPromise('parser: stream object - filter', (t, resolve, reject) => {
     // undecided
   };
 
-  const stream = streamObject.withParserAsStream({objectFilter: f}),
+  const stream = streamObject.withParserAsStream({ objectFilter: f }),
     input = {
       a: 0,
       b: 1,
@@ -100,14 +100,14 @@ test.asPromise('parser: stream object - filter', (t, resolve, reject) => {
       e: null,
       f: {},
       g: [],
-      h: {a: 'reject', b: [[[]]]},
+      h: { a: 'reject', b: [[[]]] },
       i: ['c'],
-      j: {a: 'accept'},
-      k: {a: 'neutral'},
-      l: {x: true, a: 'reject'},
-      m: {y: null, a: 'accept'},
-      n: {z: 1234, a: 'neutral'},
-      o: {w: '12', a: 'neutral'}
+      j: { a: 'accept' },
+      k: { a: 'neutral' },
+      l: { x: true, a: 'reject' },
+      m: { y: null, a: 'accept' },
+      n: { z: 1234, a: 'neutral' },
+      o: { w: '12', a: 'neutral' }
     },
     result = [];
 
@@ -144,7 +144,7 @@ test.asPromise('parser: stream object - filter include undecided', (t, resolve, 
     // undecided
   };
 
-  const stream = streamObject.withParserAsStream({objectFilter: f, includeUndecided: true}),
+  const stream = streamObject.withParserAsStream({ objectFilter: f, includeUndecided: true }),
     input = {
       a: 0,
       b: 1,
@@ -153,14 +153,14 @@ test.asPromise('parser: stream object - filter include undecided', (t, resolve, 
       e: null,
       f: {},
       g: [],
-      h: {a: 'reject', b: [[[]]]},
+      h: { a: 'reject', b: [[[]]] },
       i: ['c'],
-      j: {a: 'accept'},
-      k: {a: 'neutral'},
-      l: {x: true, a: 'reject'},
-      m: {y: null, a: 'accept'},
-      n: {z: 1234, a: 'neutral'},
-      o: {w: '12', a: 'neutral'}
+      j: { a: 'accept' },
+      k: { a: 'neutral' },
+      l: { x: true, a: 'reject' },
+      m: { y: null, a: 'accept' },
+      n: { z: 1234, a: 'neutral' },
+      o: { w: '12', a: 'neutral' }
     },
     result = [];
 
@@ -188,14 +188,14 @@ test.asPromise('parser: stream object - replacer and reviver', (t, resolve, reje
   };
 
   const source = {
-      createdDate: new Date(),
-      updatedDate: new Date(),
-      user: 'bob',
-      life: 42
-    },
+    createdDate: new Date(),
+    updatedDate: new Date(),
+    user: 'bob',
+    life: 42
+  },
     json = JSON.stringify(source);
 
-  const stream = streamObject.withParserAsStream({reviver}),
+  const stream = streamObject.withParserAsStream({ reviver }),
     result = {};
 
   stream.on('data', object => (result[object.key] = object.value));

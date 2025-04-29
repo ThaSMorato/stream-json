@@ -2,7 +2,7 @@
 
 'use strict';
 
-const {none} = require('stream-chain');
+const { none } = require('@thasmorato/stream-chain');
 
 const streamBase = require('./stream-base.js');
 const withParser = require('../utils/with-parser.js');
@@ -17,7 +17,7 @@ const streamValues = options => {
         ++key;
         return none;
       }
-      const result = {key: key++, value: asm.current};
+      const result = { key: key++, value: asm.current };
       asm.key = asm.current = null;
       return result;
     }
@@ -27,5 +27,5 @@ const streamValues = options => {
 module.exports = streamValues;
 module.exports.streamValues = streamValues;
 
-module.exports.withParser = options => withParser(streamValues, Object.assign({}, options, {jsonStreaming: true}));
-module.exports.withParserAsStream = options => withParser.asStream(streamValues, Object.assign({}, options, {jsonStreaming: true}));
+module.exports.withParser = options => withParser(streamValues, Object.assign({}, options, { jsonStreaming: true }));
+module.exports.withParserAsStream = options => withParser.asStream(streamValues, Object.assign({}, options, { jsonStreaming: true }));

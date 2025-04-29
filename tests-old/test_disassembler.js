@@ -2,14 +2,14 @@
 
 const unit = require('heya-unit');
 
-const {chain} = require('stream-chain');
+const { chain } = require('@thasmorato/stream-chain');
 
 const ReadString = require('./ReadString');
-const {parser} = require('../index');
-const {pick} = require('../filters/Pick');
-const {disassembler} = require('../Disassembler');
-const {streamArray} = require('../streamers/StreamArray');
-const {streamValues} = require('../streamers/StreamValues');
+const { parser } = require('../index');
+const { pick } = require('../filters/Pick');
+const { disassembler } = require('../Disassembler');
+const { streamArray } = require('../streamers/StreamArray');
+const { streamValues } = require('../streamers/StreamValues');
 
 const sanitize = x => {
   x = JSON.stringify(x);
@@ -25,10 +25,10 @@ unit.add(module, [
   function test_disassembler(t) {
     const async = t.startAsync('test_disassembler');
 
-    const input = [1, 2, null, true, false, {}, [], {a: {b: {c: [{d: 1}]}}}, [[[]]]],
+    const input = [1, 2, null, true, false, {}, [], { a: { b: { c: [{ d: 1 }] } } }, [[[]]]],
       result = [];
 
-    const pipeline = chain([new ReadString(JSON.stringify(input)), parser(), streamArray(), disassembler(), pick({filter: 'value'}), streamValues()]);
+    const pipeline = chain([new ReadString(JSON.stringify(input)), parser(), streamArray(), disassembler(), pick({ filter: 'value' }), streamValues()]);
 
     pipeline.on('data', item => result.push(item.value));
     pipeline.on('end', () => {
@@ -39,7 +39,7 @@ unit.add(module, [
   function test_disassembler_bad_top_level(t) {
     const async = t.startAsync('test_disassembler_bad_top_level');
 
-    const input = [1, () => {}, 2, undefined, 3, Symbol(), 4],
+    const input = [1, () => { }, 2, undefined, 3, Symbol(), 4],
       result = [];
 
     const pipeline = chain([disassembler(), streamValues()]);
@@ -58,7 +58,7 @@ unit.add(module, [
   function test_disassembler_bad_values_in_object(t) {
     const async = t.startAsync('test_disassembler_bad_values_in_object');
 
-    const input = [{a: 1, b: () => {}, c: 2, d: undefined, e: 3, f: Symbol(), g: 4}],
+    const input = [{ a: 1, b: () => { }, c: 2, d: undefined, e: 3, f: Symbol(), g: 4 }],
       result = [];
 
     const pipeline = chain([disassembler(), streamValues()]);
@@ -77,7 +77,7 @@ unit.add(module, [
   function test_disassembler_bad_values_in_array(t) {
     const async = t.startAsync('test_disassembler_bad_values_in_array');
 
-    const input = [[1, () => {}, 2, undefined, 3, Symbol(), 4]],
+    const input = [[1, () => { }, 2, undefined, 3, Symbol(), 4]],
       result = [];
 
     const pipeline = chain([disassembler(), streamValues()]);
@@ -116,7 +116,7 @@ unit.add(module, [
   function test_disassembler_chained_toJSON(t) {
     const async = t.startAsync('test_disassembler_chained_toJSON');
 
-    const x = {a: 1};
+    const x = { a: 1 };
 
     const y = {
       b: 2,
@@ -160,7 +160,7 @@ unit.add(module, [
       }
     };
 
-    const input = [x, x, {a: x, b: x}, [x, x]],
+    const input = [x, x, { a: x, b: x }, [x, x]],
       shouldBe = input.map(sanitize),
       result = [];
 
@@ -193,7 +193,7 @@ unit.add(module, [
       }
     };
 
-    const input = [x, x, {a: x, b: x}, [x, x]],
+    const input = [x, x, { a: x, b: x }, [x, x]],
       shouldBe = input.map(sanitize).filter(item => item !== undefined),
       result = [];
 
@@ -224,11 +224,11 @@ unit.add(module, [
       return v;
     };
 
-    const input = [1, 2, {a: 3, b: 4, c: 7}, [5, 6]],
+    const input = [1, 2, { a: 3, b: 4, c: 7 }, [5, 6]],
       shouldBe = input.map(sanitizeWithReplacer(replacer)),
       result = [];
 
-    const pipeline = chain([disassembler({replacer}), streamValues()]);
+    const pipeline = chain([disassembler({ replacer }), streamValues()]);
 
     pipeline.on('data', item => result.push(item.value));
     pipeline.on('end', () => {
@@ -256,11 +256,11 @@ unit.add(module, [
       return v;
     };
 
-    const input = [1, 2, {a: 3, b: 4, c: 7}, [5, 6]],
+    const input = [1, 2, { a: 3, b: 4, c: 7 }, [5, 6]],
       shouldBe = input.map(sanitizeWithReplacer(replacer)).filter(item => item !== undefined),
       result = [];
 
-    const pipeline = chain([disassembler({replacer}), streamValues()]);
+    const pipeline = chain([disassembler({ replacer }), streamValues()]);
 
     pipeline.on('data', item => result.push(item.value));
     pipeline.on('end', () => {
@@ -283,11 +283,11 @@ unit.add(module, [
 
     const replacer = ['a', 'b'];
 
-    const input = [1, 2, {a: 3, b: {a: 8, b: 9, c: 10}, c: 7}, [5, 6]],
+    const input = [1, 2, { a: 3, b: { a: 8, b: 9, c: 10 }, c: 7 }, [5, 6]],
       shouldBe = input.map(sanitizeWithReplacer(replacer)),
       result = [];
 
-    const pipeline = chain([disassembler({replacer}), streamValues()]);
+    const pipeline = chain([disassembler({ replacer }), streamValues()]);
 
     pipeline.on('data', item => result.push(item.value));
     pipeline.on('end', () => {

@@ -1,14 +1,14 @@
 'use strict';
 
 import test from 'tape-six';
-import chain from 'stream-chain';
+import chain from '@thasmorato/stream-chain';
 
 import streamArray from '../src/streamers/stream-array.js';
 
 import readString from './read-string.mjs';
 
 test.asPromise('parser: stream array', (t, resolve, reject) => {
-  const pattern = [0, 1, true, false, null, {}, [], {a: 'b'}, ['c']],
+  const pattern = [0, 1, true, false, null, {}, [], { a: 'b' }, ['c']],
     result = [],
     pipeline = chain([readString(JSON.stringify(pattern)), streamArray.withParser()]);
 
@@ -52,7 +52,7 @@ test.asPromise('parser: stream - array filter', (t, resolve, reject) => {
     // undecided
   };
 
-  const stream = streamArray.withParserAsStream({objectFilter: f}),
+  const stream = streamArray.withParserAsStream({ objectFilter: f }),
     input = [
       0,
       1,
@@ -61,14 +61,14 @@ test.asPromise('parser: stream - array filter', (t, resolve, reject) => {
       null,
       {},
       [],
-      {a: 'reject', b: [[[]]]},
+      { a: 'reject', b: [[[]]] },
       ['c'],
-      {a: 'accept'},
-      {a: 'neutral'},
-      {x: true, a: 'reject'},
-      {y: null, a: 'accept'},
-      {z: 1234, a: 'neutral'},
-      {w: '12', a: 'neutral'}
+      { a: 'accept' },
+      { a: 'neutral' },
+      { x: true, a: 'reject' },
+      { y: null, a: 'accept' },
+      { z: 1234, a: 'neutral' },
+      { w: '12', a: 'neutral' }
     ],
     result = [];
 
@@ -105,7 +105,7 @@ test.asPromise('parser: stream array - filter include undecided', (t, resolve, r
     // undecided
   };
 
-  const stream = streamArray.withParserAsStream({objectFilter: f, includeUndecided: true}),
+  const stream = streamArray.withParserAsStream({ objectFilter: f, includeUndecided: true }),
     input = [
       0,
       1,
@@ -114,14 +114,14 @@ test.asPromise('parser: stream array - filter include undecided', (t, resolve, r
       null,
       {},
       [],
-      {a: 'reject', b: [[[]]]},
+      { a: 'reject', b: [[[]]] },
       ['c'],
-      {a: 'accept'},
-      {a: 'neutral'},
-      {x: true, a: 'reject'},
-      {y: null, a: 'accept'},
-      {z: 1234, a: 'neutral'},
-      {w: '12', a: 'neutral'}
+      { a: 'accept' },
+      { a: 'neutral' },
+      { x: true, a: 'reject' },
+      { y: null, a: 'accept' },
+      { z: 1234, a: 'neutral' },
+      { w: '12', a: 'neutral' }
     ],
     result = [];
 
@@ -148,10 +148,10 @@ test.asPromise('parser: stream array - replacer and reviver', (t, resolve, rejec
     return v;
   };
 
-  const source = [{createdDate: new Date(), updatedDate: new Date(), user: 'bob', life: 42}],
+  const source = [{ createdDate: new Date(), updatedDate: new Date(), user: 'bob', life: 42 }],
     json = JSON.stringify(source);
 
-  const stream = streamArray.withParserAsStream({reviver}),
+  const stream = streamArray.withParserAsStream({ reviver }),
     result = [];
 
   stream.on('data', object => result.push(object.value));

@@ -2,8 +2,7 @@
 
 'use strict';
 
-const {asStream, flushable, gen, many, none} = require('stream-chain');
-const fixUtf8Stream = require('stream-chain/utils/fixUtf8Stream.js');
+const { asStream, flushable, gen, many, none, utils: { fixUtf8Stream } } = require('@thasmorato/stream-chain');
 
 const patterns = {
   value1: /[\"\{\[\]\-\d]|true\b|false\b|null\b|\s{1,256}/y,
@@ -23,14 +22,14 @@ const MAX_PATTERN_SIZE = 16;
 patterns.numberFracStart = patterns.numberExpStart = patterns.numberStart;
 patterns.numberFracDigit = patterns.numberExpDigit = patterns.numberDigit;
 
-const values = {true: true, false: false, null: null},
-  expected = {object: 'objectStop', array: 'arrayStop', '': 'done'};
+const values = { true: true, false: false, null: null },
+  expected = { object: 'objectStop', array: 'arrayStop', '': 'done' };
 
 // long hexadecimal codes: \uXXXX
 const fromHex = s => String.fromCharCode(parseInt(s.slice(2), 16));
 
 // short codes: \b \f \n \r \t \" \\ \/
-const codes = {b: '\b', f: '\f', n: '\n', r: '\r', t: '\t', '"': '"', '\\': '\\', '/': '/'};
+const codes = { b: '\b', f: '\f', n: '\n', r: '\r', t: '\t', '"': '"', '\\': '\\', '/': '/' };
 
 const jsonParser = options => {
   let packKeys = true,
@@ -79,7 +78,7 @@ const jsonParser = options => {
       value,
       index = 0;
 
-    main: for (;;) {
+    main: for (; ;) {
       switch (expect) {
         case 'value1':
         case 'value':
@@ -95,17 +94,17 @@ const jsonParser = options => {
           value = match[0];
           switch (value) {
             case '"':
-              if (streamStrings) tokens.push({name: 'startString'});
+              if (streamStrings) tokens.push({ name: 'startString' });
               expect = 'string';
               break;
             case '{':
-              tokens.push({name: 'startObject'});
+              tokens.push({ name: 'startObject' });
               stack.push(parent);
               parent = 'object';
               expect = 'key1';
               break;
             case '[':
-              tokens.push({name: 'startArray'});
+              tokens.push({ name: 'startArray' });
               stack.push(parent);
               parent = 'array';
               expect = 'value1';
@@ -113,21 +112,21 @@ const jsonParser = options => {
             case ']':
               if (expect !== 'value1') throw new Error("Parser cannot parse input: unexpected token ']'");
               if (openNumber) {
-                if (streamNumbers) tokens.push({name: 'endNumber'});
+                if (streamNumbers) tokens.push({ name: 'endNumber' });
                 openNumber = false;
                 if (packNumbers) {
-                  tokens.push({name: 'numberValue', value: accumulator});
+                  tokens.push({ name: 'numberValue', value: accumulator });
                   accumulator = '';
                 }
               }
-              tokens.push({name: 'endArray'});
+              tokens.push({ name: 'endArray' });
               parent = stack.pop();
               expect = expected[parent];
               break;
             case '-':
               openNumber = true;
               if (streamNumbers) {
-                tokens.push({name: 'startNumber'}, {name: 'numberChunk', value: '-'});
+                tokens.push({ name: 'startNumber' }, { name: 'numberChunk', value: '-' });
               }
               packNumbers && (accumulator = '-');
               expect = 'numberStart';
@@ -135,7 +134,7 @@ const jsonParser = options => {
             case '0':
               openNumber = true;
               if (streamNumbers) {
-                tokens.push({name: 'startNumber'}, {name: 'numberChunk', value: '0'});
+                tokens.push({ name: 'startNumber' }, { name: 'numberChunk', value: '0' });
               }
               packNumbers && (accumulator = '0');
               expect = 'numberFraction';
@@ -151,7 +150,7 @@ const jsonParser = options => {
             case '9':
               openNumber = true;
               if (streamNumbers) {
-                tokens.push({name: 'startNumber'}, {name: 'numberChunk', value: value});
+                tokens.push({ name: 'startNumber' }, { name: 'numberChunk', value: value });
               }
               packNumbers && (accumulator = value);
               expect = 'numberDigit';
@@ -160,7 +159,7 @@ const jsonParser = options => {
             case 'false':
             case 'null':
               if (buffer.length - index === value.length && !done) break main; // wait for more input
-              tokens.push({name: value + 'Value', value: values[value]});
+              tokens.push({ name: value + 'Value', value: values[value] });
               expect = expected[parent];
               break;
             // default: // ws
@@ -179,16 +178,16 @@ const jsonParser = options => {
           value = match[0];
           if (value === '"') {
             if (expect === 'keyVal') {
-              if (streamKeys) tokens.push({name: 'endKey'});
+              if (streamKeys) tokens.push({ name: 'endKey' });
               if (packKeys) {
-                tokens.push({name: 'keyValue', value: accumulator});
+                tokens.push({ name: 'keyValue', value: accumulator });
                 accumulator = '';
               }
               expect = 'colon';
             } else {
-              if (streamStrings) tokens.push({name: 'endString'});
+              if (streamStrings) tokens.push({ name: 'endString' });
               if (packStrings) {
-                tokens.push({name: 'stringValue', value: accumulator});
+                tokens.push({ name: 'stringValue', value: accumulator });
                 accumulator = '';
               }
               expect = expected[parent];
@@ -196,14 +195,14 @@ const jsonParser = options => {
           } else if (value.length > 1 && value.charAt(0) === '\\') {
             const t = value.length == 2 ? codes[value.charAt(1)] : fromHex(value);
             if (expect === 'keyVal' ? streamKeys : streamStrings) {
-              tokens.push({name: 'stringChunk', value: t});
+              tokens.push({ name: 'stringChunk', value: t });
             }
             if (expect === 'keyVal' ? packKeys : packStrings) {
               accumulator += t;
             }
           } else {
             if (expect === 'keyVal' ? streamKeys : streamStrings) {
-              tokens.push({name: 'stringChunk', value: value});
+              tokens.push({ name: 'stringChunk', value: value });
             }
             if (expect === 'keyVal' ? packKeys : packStrings) {
               accumulator += value;
@@ -221,11 +220,11 @@ const jsonParser = options => {
           }
           value = match[0];
           if (value === '"') {
-            if (streamKeys) tokens.push({name: 'startKey'});
+            if (streamKeys) tokens.push({ name: 'startKey' });
             expect = 'keyVal';
           } else if (value === '}') {
             if (expect !== 'key1') throw new Error("Parser cannot parse input: unexpected token '}'");
-            tokens.push({name: 'endObject'});
+            tokens.push({ name: 'endObject' });
             parent = stack.pop();
             expect = expected[parent];
           }
@@ -251,10 +250,10 @@ const jsonParser = options => {
             break main; // wait for more input
           }
           if (openNumber) {
-            if (streamNumbers) tokens.push({name: 'endNumber'});
+            if (streamNumbers) tokens.push({ name: 'endNumber' });
             openNumber = false;
             if (packNumbers) {
-              tokens.push({name: 'numberValue', value: accumulator});
+              tokens.push({ name: 'numberValue', value: accumulator });
               accumulator = '';
             }
           }
@@ -265,7 +264,7 @@ const jsonParser = options => {
             if (value === '}' ? expect === 'arrayStop' : expect !== 'arrayStop') {
               throw new Error("Parser cannot parse input: expected '" + (expect === 'arrayStop' ? ']' : '}') + "'");
             }
-            tokens.push({name: value === '}' ? 'endObject' : 'endArray'});
+            tokens.push({ name: value === '}' ? 'endObject' : 'endArray' });
             parent = stack.pop();
             expect = expected[parent];
           }
@@ -280,7 +279,7 @@ const jsonParser = options => {
             break main; // wait for more input
           }
           value = match[0];
-          if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+          if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
           packNumbers && (accumulator += value);
           expect = value === '0' ? 'numberFraction' : 'numberDigit';
           index += value.length;
@@ -294,7 +293,7 @@ const jsonParser = options => {
           }
           value = match[0];
           if (value) {
-            if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+            if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
             packNumbers && (accumulator += value);
             index += value.length;
           } else {
@@ -320,7 +319,7 @@ const jsonParser = options => {
             break main; // wait for more input
           }
           value = match[0];
-          if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+          if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
           packNumbers && (accumulator += value);
           expect = value === '.' ? 'numberFracStart' : 'numberExpSign';
           index += value.length;
@@ -333,7 +332,7 @@ const jsonParser = options => {
             break main; // wait for more input
           }
           value = match[0];
-          if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+          if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
           packNumbers && (accumulator += value);
           expect = 'numberFracDigit';
           index += value.length;
@@ -343,7 +342,7 @@ const jsonParser = options => {
           match = patterns.numberFracDigit.exec(buffer);
           value = match[0];
           if (value) {
-            if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+            if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
             packNumbers && (accumulator += value);
             index += value.length;
           } else {
@@ -373,7 +372,7 @@ const jsonParser = options => {
             break main; // wait for more input
           }
           value = match[0];
-          if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+          if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
           packNumbers && (accumulator += value);
           expect = 'numberExpSign';
           index += value.length;
@@ -390,7 +389,7 @@ const jsonParser = options => {
             break main; // wait for more input
           }
           value = match[0];
-          if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+          if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
           packNumbers && (accumulator += value);
           expect = 'numberExpStart';
           index += value.length;
@@ -403,7 +402,7 @@ const jsonParser = options => {
             break main; // wait for more input
           }
           value = match[0];
-          if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+          if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
           packNumbers && (accumulator += value);
           expect = 'numberExpDigit';
           index += value.length;
@@ -413,7 +412,7 @@ const jsonParser = options => {
           match = patterns.numberExpDigit.exec(buffer);
           value = match[0];
           if (value) {
-            if (streamNumbers) tokens.push({name: 'numberChunk', value: value});
+            if (streamNumbers) tokens.push({ name: 'numberChunk', value: value });
             packNumbers && (accumulator += value);
             index += value.length;
           } else {
@@ -439,10 +438,10 @@ const jsonParser = options => {
           }
           value = match[0];
           if (openNumber) {
-            if (streamNumbers) tokens.push({name: 'endNumber'});
+            if (streamNumbers) tokens.push({ name: 'endNumber' });
             openNumber = false;
             if (packNumbers) {
-              tokens.push({name: 'numberValue', value: accumulator});
+              tokens.push({ name: 'numberValue', value: accumulator });
               accumulator = '';
             }
           }
@@ -451,10 +450,10 @@ const jsonParser = options => {
       }
     }
     if (done && openNumber) {
-      if (streamNumbers) tokens.push({name: 'endNumber'});
+      if (streamNumbers) tokens.push({ name: 'endNumber' });
       openNumber = false;
       if (packNumbers) {
-        tokens.push({name: 'numberValue', value: accumulator});
+        tokens.push({ name: 'numberValue', value: accumulator });
         accumulator = '';
       }
     }
