@@ -4,8 +4,8 @@ const streamValues = require('./stream-values.js');
 const streamBase = require('./stream-base.js');
 
 module.exports = {
-  ...streamArray,
-  ...streamObject,
-  ...streamValues,
-  ...streamBase
+  streamArray,
+  streamObject,
+  streamValues,
+  streamBase
 };

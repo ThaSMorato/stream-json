@@ -6,10 +6,10 @@ const verifier = require('./verifier.js');
 const withParser = require('./with-parser.js');
 
 module.exports = {
-  ...batch,
-  ...withParser,
-  ...emit,
-  ...utf8Stream,
-  ...verifier,
-  ...withParser
+  batch,
+  withParser,
+  emit,
+  utf8Stream,
+  verifier,
+  withParser
 };

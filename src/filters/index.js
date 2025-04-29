@@ -5,9 +5,9 @@ const pick = require('./pick.js');
 const replace = require('./replace.js');
 
 module.exports = {
-  ...filterBase,
-  ...filter,
-  ...ingnore,
-  ...pick,
-  ...replace
+  filterBase,
+  filter,
+  ingnore,
+  pick,
+  replace
 }
