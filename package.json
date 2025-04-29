@@ -1,10 +1,9 @@
 {
   "name": "@thasmorato/stream-json",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "stream-json is the micro-library of Node.js stream components for creating custom JSON processing pipelines with a minimal memory footprint. It can parse JSON files far exceeding available memory streaming individual primitives using a SAX-inspired API. Includes utilities to stream JSON database dumps.",
   "type": "commonjs",
   "main": "./src/index.js",
-  "types": "./src/index.d.ts",
   "exports": {
     ".": "./src/index.js",
     "./*": "./src/*"
